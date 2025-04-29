@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  maps      Map[]
+}
+
+model Map {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  width       Int
+  height      Int
+  gridSizeKm  Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  owner       User       @relation(fields: [ownerId], references: [id])
+  labels      MapLabel[]
+  tiles       Tile[]
+}
+
+model Tile {
+  id       String   @id @default(cuid())
+  mapId    String
+  x        Int
+  y        Int
+  terrain  String
+  features String[]
+  map      Map      @relation(fields: [mapId], references: [id])
+}
+
+model MapLabel {
+  id    String @id @default(cuid())
+  mapId String
+  x     Float
+  y     Float
+  text  String
+  size  Int
+  map   Map    @relation(fields: [mapId], references: [id])
+}

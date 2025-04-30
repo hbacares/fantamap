@@ -5,7 +5,13 @@ module.exports = {
       './components/**/*.{js,ts,jsx,tsx}',
     ],
     theme: {
-      extend: {},
+        extend: {
+            colors: {
+              parchment: '#fdf6e3',
+              leather: '#a67c52',
+              ink: '#3b2f2f',
+            },
+          },      
     },
     plugins: [],
   }

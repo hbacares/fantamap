@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --label: #f9eec0;
+    --font-serif: 'Cinzel', serif; /* or IM Fell, etc. */
+ 
+}
+
+.fantasy-label {
+    color: var(--label);
+    font-family: var(--font-serif);
+    letter-spacing: 0.025em;
+  }
+  
+  .fantasy-heading {
+    color: var(--label);
+    font-family: var(--font-serif);
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 0.075em;
+  }
+  
+  .fantasy-card {
+    background-color: rgba(255, 248, 225, 0.85);
+    border: 4px solid #a67c52;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  }
+

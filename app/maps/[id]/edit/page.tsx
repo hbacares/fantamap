@@ -5,11 +5,16 @@
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function MapEditorPage() {
   const { id } = useParams()
   const [mapData, setMapData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null)
+  const [tileLabel, setTileLabel] = useState("")
 
   useEffect(() => {
     async function fetchMap() {
@@ -36,10 +41,34 @@ export default function MapEditorPage() {
             "border border-gray-300 w-8 h-8 text-[10px] flex items-center justify-center text-gray-500",
             "hover:bg-blue-50 cursor-pointer"
           )}
+          onClick={() => setSelectedCell({ x, y })}
         >
           {x},{y}
         </div>
       )
+    }
+  }
+
+  const handleSave = async () => {
+    if (!selectedCell) return
+
+    const res = await fetch(`/api/maps/${id}/tiles`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        x: selectedCell.x,
+        y: selectedCell.y,
+        label: tileLabel
+      })
+    })
+
+    if (res.ok) {
+      setSelectedCell(null)
+      setTileLabel("")
+    } else {
+      alert("Failed to save tile.")
     }
   }
 
@@ -58,6 +87,29 @@ export default function MapEditorPage() {
           {grid}
         </div>
       </div>
+
+      <Dialog open={!!selectedCell} onOpenChange={() => setSelectedCell(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Tile Editor — ({selectedCell?.x}, {selectedCell?.y})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">
+              Label
+              <Input
+                value={tileLabel}
+                onChange={(e) => setTileLabel(e.target.value)}
+                placeholder="Mountain, city, cave entrance..."
+              />
+            </label>
+            <Button onClick={handleSave} className="w-full">
+              Save Tile
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

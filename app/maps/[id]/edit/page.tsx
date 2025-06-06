@@ -12,20 +12,31 @@ import { Input } from "@/components/ui/input"
 export default function MapEditorPage() {
   const { id } = useParams()
   const [mapData, setMapData] = useState<any>(null)
+  const [tiles, setTiles] = useState<{ [key: string]: string }>({})
   const [loading, setLoading] = useState(true)
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null)
   const [tileLabel, setTileLabel] = useState("")
 
   useEffect(() => {
-    async function fetchMap() {
+    async function fetchMapAndTiles() {
       const res = await fetch(`/api/maps/${id}`)
-      if (res.ok) {
-        const data = await res.json()
-        setMapData(data)
+      if (!res.ok) return setLoading(false)
+      const data = await res.json()
+      setMapData(data)
+
+      const tileRes = await fetch(`/api/maps/${id}/tiles`)
+      if (tileRes.ok) {
+        const tileData = await tileRes.json()
+        const tileMap: { [key: string]: string } = {}
+        tileData.forEach((t: any) => {
+          tileMap[`${t.x},${t.y}`] = t.label
+        })
+        setTiles(tileMap)
       }
+
       setLoading(false)
     }
-    if (id) fetchMap()
+    if (id) fetchMapAndTiles()
   }, [id])
 
   if (loading) return <div className="p-6 text-gray-700">Loading map...</div>
@@ -34,16 +45,20 @@ export default function MapEditorPage() {
   const grid = []
   for (let y = 0; y < mapData.height; y++) {
     for (let x = 0; x < mapData.width; x++) {
+      const label = tiles[`${x},${y}`]
       grid.push(
         <div
           key={`${x}-${y}`}
           className={cn(
-            "border border-gray-300 w-8 h-8 text-[10px] flex items-center justify-center text-gray-500",
+            "border border-gray-300 w-8 h-8 text-[10px] flex items-center justify-center text-gray-700 text-center p-0.5 overflow-hidden",
             "hover:bg-blue-50 cursor-pointer"
           )}
-          onClick={() => setSelectedCell({ x, y })}
+          onClick={() => {
+            setSelectedCell({ x, y })
+            setTileLabel(label || "")
+          }}
         >
-          {x},{y}
+          {label || `${x},${y}`}
         </div>
       )
     }
@@ -65,6 +80,10 @@ export default function MapEditorPage() {
     })
 
     if (res.ok) {
+      setTiles((prev) => ({
+        ...prev,
+        [`${selectedCell.x},${selectedCell.y}`]: tileLabel
+      }))
       setSelectedCell(null)
       setTileLabel("")
     } else {

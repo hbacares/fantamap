@@ -16,6 +16,7 @@ export default function MapEditorPage() {
   const [loading, setLoading] = useState(true)
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null)
   const [tileLabel, setTileLabel] = useState("")
+  const [scale, setScale] = useState(1) // zoom factor
 
   useEffect(() => {
     async function fetchMapAndTiles() {
@@ -50,9 +51,10 @@ export default function MapEditorPage() {
         <div
           key={`${x}-${y}`}
           className={cn(
-            "border border-gray-300 w-8 h-8 text-[10px] flex items-center justify-center text-gray-700 text-center p-0.5 overflow-hidden",
+            "border border-gray-300 flex items-center justify-center text-gray-700 text-center p-0.5 overflow-hidden",
             "hover:bg-blue-50 cursor-pointer"
           )}
+          style={{ width: `${2 * scale}rem`, height: `${2 * scale}rem`, fontSize: `${0.625 * scale}rem` }}
           onClick={() => {
             setSelectedCell({ x, y })
             setTileLabel(label || "")
@@ -94,13 +96,19 @@ export default function MapEditorPage() {
   return (
     <div className="min-h-screen p-6">
       <h1 className="text-2xl font-semibold mb-4">Editing: {mapData.name}</h1>
-      <p className="mb-6 text-gray-600">{mapData.description}</p>
+      <p className="mb-4 text-gray-600">{mapData.description}</p>
+
+      <div className="mb-4 flex gap-2 items-center">
+        <Button size="sm" onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>-</Button>
+        <span className="text-sm text-gray-700">Zoom: {scale}x</span>
+        <Button size="sm" onClick={() => setScale((s) => Math.min(3, s + 0.25))}>+</Button>
+      </div>
 
       <div className="overflow-auto border rounded shadow-inner max-h-[75vh] max-w-full">
         <div
           className="grid"
           style={{
-            gridTemplateColumns: `repeat(${mapData.width}, 2rem)`
+            gridTemplateColumns: `repeat(${mapData.width}, ${2 * scale}rem)`
           }}
         >
           {grid}

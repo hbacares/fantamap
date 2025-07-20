@@ -1,4 +1,4 @@
-// app/api/maps/[id]/tiles/route.ts
+// app/api/maps/[id]/tiles/routes.ts
 
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"

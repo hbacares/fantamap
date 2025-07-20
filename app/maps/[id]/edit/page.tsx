@@ -17,6 +17,8 @@ export default function MapEditorPage() {
   const [selectedCell, setSelectedCell] = useState<{ x: number; y: number } | null>(null)
   const [tileLabel, setTileLabel] = useState("")
   const [scale, setScale] = useState(1) // zoom factor
+  const tools = ["Grass", "Rock", "Road", "Water", "Forest"]
+  const [activeTool, setActiveTool] = useState(tools[0])
 
   useEffect(() => {
     async function fetchMapAndTiles() {
@@ -94,49 +96,70 @@ export default function MapEditorPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <h1 className="text-2xl font-semibold mb-4">Editing: {mapData.name}</h1>
-      <p className="mb-4 text-gray-600">{mapData.description}</p>
+    <div className="flex min-h-screen">
+      <aside className="w-48 border-r bg-gray-50 p-4">
+        <h2 className="text-lg font-semibold mb-4">Tools</h2>
+        <ul className="space-y-2">
+          {tools.map((tool) => (
+            <li
+              key={tool}
+              className={cn(
+                "cursor-pointer rounded px-2 py-1 text-sm",
+                tool === activeTool
+                  ? "bg-blue-100 text-blue-800 font-medium"
+                  : "hover:bg-gray-100"
+              )}
+              onClick={() => setActiveTool(tool)}
+            >
+              {tool}
+            </li>
+          ))}
+        </ul>
+      </aside>
+      <main className="flex-1 p-6">
+        <h1 className="text-2xl font-semibold mb-4">Editing: {mapData.name}</h1>
+        <p className="mb-4 text-gray-600">{mapData.description}</p>
 
-      <div className="mb-4 flex gap-2 items-center">
-        <Button size="sm" onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>-</Button>
-        <span className="text-sm text-gray-700">Zoom: {scale}x</span>
-        <Button size="sm" onClick={() => setScale((s) => Math.min(3, s + 0.25))}>+</Button>
-      </div>
-
-      <div className="overflow-auto border rounded shadow-inner max-h-[75vh] max-w-full">
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: `repeat(${mapData.width}, ${2 * scale}rem)`
-          }}
-        >
-          {grid}
+        <div className="mb-4 flex gap-2 items-center">
+          <Button size="sm" onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>-</Button>
+          <span className="text-sm text-gray-700">Zoom: {scale}x</span>
+          <Button size="sm" onClick={() => setScale((s) => Math.min(3, s + 0.25))}>+</Button>
         </div>
-      </div>
 
-      <Dialog open={!!selectedCell} onOpenChange={() => setSelectedCell(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Tile Editor — ({selectedCell?.x}, {selectedCell?.y})
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Label
-              <Input
-                value={tileLabel}
-                onChange={(e) => setTileLabel(e.target.value)}
-                placeholder="Mountain, city, cave entrance..."
-              />
-            </label>
-            <Button onClick={handleSave} className="w-full">
-              Save Tile
-            </Button>
+        <div className="overflow-auto border rounded shadow-inner max-h-[75vh] max-w-full">
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: `repeat(${mapData.width}, ${2 * scale}rem)`
+            }}
+          >
+            {grid}
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+
+        <Dialog open={!!selectedCell} onOpenChange={() => setSelectedCell(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Tile Editor — ({selectedCell?.x}, {selectedCell?.y})
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Label
+                <Input
+                  value={tileLabel}
+                  onChange={(e) => setTileLabel(e.target.value)}
+                  placeholder="Mountain, city, cave entrance..."
+                />
+              </label>
+              <Button onClick={handleSave} className="w-full">
+                Save Tile
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </main>
     </div>
   )
 }

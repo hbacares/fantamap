@@ -17,6 +17,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
     "@prisma/client": "^6.7.0",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.0",
     "@types/node": "^22.15.3",
     "@types/react": "^19.1.2",

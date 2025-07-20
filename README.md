@@ -70,7 +70,7 @@ Open http://localhost:3000 to use the app.
 - [ ] Export to PDF / PNG
 - [ ] Mobile & tablet responsiveness
 
-##  Contributing
+## Contributing
 
 Pull requests are welcome! Please open an issue first to discuss major changes.
 
